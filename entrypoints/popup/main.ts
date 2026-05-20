@@ -1,5 +1,12 @@
 import { createApp } from 'vue';
+import { create } from 'naive-ui';
 import './style.css';
-import App from './App.vue';
+import Popup from './Popup.vue';
 
-createApp(App).mount('#app');
+// Создаем экземпляр Naive UI
+const naive = create();
+
+const app = createApp(Popup);
+// Регистрируем компоненты Naive UI глобально
+app.use(naive);
+app.mount('#app');
