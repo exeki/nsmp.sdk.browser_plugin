@@ -1,6 +1,5 @@
 import {defineConfig} from 'wxt';
 
-// See r
 export default defineConfig({
     modules: ['@wxt-dev/module-vue'],
     manifest: {
@@ -8,5 +7,7 @@ export default defineConfig({
         description: 'Browser plugin for NSMP SDK',
         options_page: 'options.html',
         default_locale: 'en',
+        permissions: ["notifications", "alarms", "storage"],
+        host_permissions: ['*://*.google.com/*', '*://yandex.ru/*']
     },
 });

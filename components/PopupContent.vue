@@ -11,8 +11,6 @@ const checkServerStatus = () => {
   serverStatus.value = serverStatus.value === 'online' ? 'offline' : 'online';
 };
 
-
-
 </script>
 
 <template>

@@ -4,7 +4,7 @@ import ProjectTable from '@/components/options/ProjectTable.vue';
 import { t } from '@/utils/i18n';
 // Состояние настроек
 const port = ref(8123);
-import {NButton, NSpace, NForm, NFormItem, NInputNumber, NCard } from 'naive-ui'
+import {NButton, NSpace, NForm, NFormItem, NInputNumber, NCard, useNotification } from 'naive-ui'
 
 interface TableData {
   key: number;
@@ -22,6 +22,7 @@ const tableData = ref<TableData[]>([
     path: 'C:/projects/test'
   }
 ]);
+const notification = useNotification()
 
 // Загрузка сохраненных настроек при монтировании
 onMounted(async () => {
@@ -58,13 +59,13 @@ const addProject = () => {
 };
 
 function test(){
-  browser.notifications.create({
-    type: "basic",
-    iconUrl: "../public/icon/16.png",
-    title: "Готово",
-    message: "Задача завершена"
-  });
+  notification.info({
+    title: `Notification index: `,
+    content: 'You can limit the index of notifications',
+    duration: 2000,
+  })
 }
+
 </script>
 
 <template>
@@ -75,10 +76,7 @@ function test(){
         <h2>{{ t('optionsPageTitle') }}</h2>
       </template>
 
-
-      <NSpace vertical>
-        <NButton type="primary" @click="test">TEST</NButton>
-      </NSpace>
+    <NButton type="primary" @click="test">TEST</NButton>
 
       <!-- Основное содержимое -->
       <NSpace vertical>
