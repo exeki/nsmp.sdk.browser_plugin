@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 
-import {darkTheme, useOsTheme, NCard, NConfigProvider} from 'naive-ui'
+import {darkTheme, useOsTheme, NConfigProvider} from 'naive-ui'
 import OptionsContent from "@/components/OptionsContent.vue";
 
 const osTheme = useOsTheme()

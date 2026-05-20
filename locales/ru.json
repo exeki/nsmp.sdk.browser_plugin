@@ -1,0 +1,17 @@
+{
+  "extensionTitle": "NSMP SDK",
+  "settings": "Настройки",
+  "languageSelector": "Язык",
+  "portSetting": "Порт локального сервера",
+  "projectInfo": "Информация о локальных проектах",
+  "host": "Хост",
+  "project": "Проект",
+  "path": "Путь",
+  "actions": "Действия",
+  "edit": "Ред",
+  "delete": "Уд",
+  "addProject": "Добавить проект",
+  "serverStatus": "Состояние сервера",
+  "manualCheck": "Проверить вручную",
+  "optionsPageTitle": "Настройки NSMP SDK"
+}

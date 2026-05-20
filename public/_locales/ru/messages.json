@@ -1,0 +1,47 @@
+{
+  "extensionTitle": {
+    "message": "NSMP SDK"
+  },
+  "settings": {
+    "message": "Настройки"
+  },
+  "languageSelector": {
+    "message": "Язык"
+  },
+  "portSetting": {
+    "message": "Порт локального сервера"
+  },
+  "projectInfo": {
+    "message": "Информация о локальных проектах"
+  },
+  "host": {
+    "message": "Хост"
+  },
+  "project": {
+    "message": "Проект"
+  },
+  "path": {
+    "message": "Путь"
+  },
+  "actions": {
+    "message": "Действия"
+  },
+  "edit": {
+    "message": "Ред"
+  },
+  "delete": {
+    "message": "Уд"
+  },
+  "addProject": {
+    "message": "Добавить проект"
+  },
+  "serverStatus": {
+    "message": "Состояние сервера"
+  },
+  "manualCheck": {
+    "message": "Проверить вручную"
+  },
+  "optionsPageTitle": {
+    "message": "Настройки NSMP SDK"
+  }
+}

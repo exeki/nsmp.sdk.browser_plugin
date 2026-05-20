@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { defineProps, defineEmits } from 'vue';
 import { NTable, NButton, NSpace } from 'naive-ui'
+import { t } from '@/utils/i18n';
 
 interface DataItem {
   key: number;
@@ -35,10 +36,10 @@ const deleteProject = (item: any) => {
   <NTable :bordered="true" :single-line="false" size="small">
     <thead>
       <tr>
-        <th>Хост</th>
-        <th>Проект</th>
-        <th>Путь</th>
-        <th>Действия</th>
+        <th>{{ t('host') }}</th>
+        <th>{{ t('project') }}</th>
+        <th>{{ t('path') }}</th>
+        <th>{{ t('actions') }}</th>
       </tr>
     </thead>
     <tbody>
@@ -48,8 +49,8 @@ const deleteProject = (item: any) => {
         <td>{{ item.path }}</td>
         <td>
           <NSpace size="small">
-            <NButton size="small" type="primary" @click="editProject(item)">Ред</NButton>
-            <NButton size="small" type="error" @click="deleteProject(item)">Уд</NButton>
+            <NButton size="small" type="primary" @click="editProject(item)">{{ t('edit') }}</NButton>
+            <NButton size="small" type="error" @click="deleteProject(item)">{{ t('delete') }}</NButton>
           </NSpace>
         </td>
       </tr>

@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import {ref, onMounted, watch} from 'vue';
+import {ref, onMounted, watch, computed} from 'vue';
 import ProjectTable from '@/components/options/ProjectTable.vue';
+import { t } from '@/utils/i18n';
 // Состояние настроек
-const language = ref('ru');
 const port = ref(8123);
-import {NButton, NSpace, NForm, NFormItem, NInputNumber, NCard, NSelect, useOsTheme, darkTheme} from 'naive-ui'
+import {NButton, NSpace, NForm, NFormItem, NInputNumber, NCard } from 'naive-ui'
 
 interface TableData {
   key: number;
@@ -26,8 +26,7 @@ const tableData = ref<TableData[]>([
 // Загрузка сохраненных настроек при монтировании
 onMounted(async () => {
   try {
-    const result = await browser.storage.sync.get(['language', 'port', 'projectMappings']);
-    if (result.language) language.value = result.language as string;
+    const result = await browser.storage.sync.get(['port', 'projectMappings']);
     if (result.port !== undefined) port.value = result.port as number;
     if (result.projectMappings) tableData.value = result.projectMappings as TableData[];
   } catch (error) {
@@ -39,7 +38,6 @@ onMounted(async () => {
 const saveSettings = async () => {
   try {
     await browser.storage.sync.set({
-      language: language.value,
       port: port.value,
       projectMappings: tableData.value
     });
@@ -50,7 +48,6 @@ const saveSettings = async () => {
 };
 
 // Обновление настроек при изменении значений
-watch(language, saveSettings);
 watch(port, saveSettings);
 watch(tableData, saveSettings, {deep: true});
 
@@ -60,8 +57,14 @@ const addProject = () => {
   console.log('Add project clicked');
 };
 
-const osTheme = useOsTheme()
-const theme = computed(() => (osTheme.value === 'dark' ? darkTheme : null))
+function test(){
+  browser.notifications.create({
+    type: "basic",
+    iconUrl: "../public/icon/16.png",
+    title: "Готово",
+    message: "Задача завершена"
+  });
+}
 </script>
 
 <template>
@@ -69,24 +72,18 @@ const theme = computed(() => (osTheme.value === 'dark' ? darkTheme : null))
     <NCard :bordered="false" class="options-container">
       <!-- Заголовок -->
       <template #header>
-        <h2>Настройки NSMP SDK</h2>
+        <h2>{{ t('optionsPageTitle') }}</h2>
       </template>
+
+
+      <NSpace vertical>
+        <NButton type="primary" @click="test">TEST</NButton>
+      </NSpace>
 
       <!-- Основное содержимое -->
       <NSpace vertical>
         <NForm label-placement="top">
-          <NFormItem label="Переключатель языка">
-            <NSelect
-                v-model:value="language"
-                :options="[
-              { label: 'Русский', value: 'ru' },
-              { label: 'English', value: 'en' }
-            ]"
-                placeholder="Выберите язык"
-            />
-          </NFormItem>
-
-          <NFormItem label="Порт локального сервера">
+          <NFormItem :label="t('portSetting')">
             <NInputNumber
                 v-model:value="port"
                 placeholder="Порт сервера"
@@ -97,9 +94,9 @@ const theme = computed(() => (osTheme.value === 'dark' ? darkTheme : null))
           </NFormItem>
         </NForm>
 
-        <h3>Информация о локальных проектах</h3>
+        <h3>{{ t('projectInfo') }}</h3>
         <ProjectTable :data="tableData"/>
-        <NButton type="primary" @click="addProject">Добавить проект</NButton>
+        <NButton type="primary" @click="addProject">{{ t('addProject') }}</NButton>
       </NSpace>
 
       <!-- Футер -->

@@ -1,0 +1,47 @@
+{
+  "extensionTitle": {
+    "message": "NSMP SDK"
+  },
+  "settings": {
+    "message": "Settings"
+  },
+  "languageSelector": {
+    "message": "Language"
+  },
+  "portSetting": {
+    "message": "Local server port"
+  },
+  "projectInfo": {
+    "message": "Local projects information"
+  },
+  "host": {
+    "message": "Host"
+  },
+  "project": {
+    "message": "Project"
+  },
+  "path": {
+    "message": "Path"
+  },
+  "actions": {
+    "message": "Actions"
+  },
+  "edit": {
+    "message": "Edit"
+  },
+  "delete": {
+    "message": "Delete"
+  },
+  "addProject": {
+    "message": "Add project"
+  },
+  "serverStatus": {
+    "message": "Server status"
+  },
+  "manualCheck": {
+    "message": "Check manually"
+  },
+  "optionsPageTitle": {
+    "message": "NSMP SDK Settings"
+  }
+}

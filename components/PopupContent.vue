@@ -1,6 +1,7 @@
 <script lang="ts" setup>
-import {ref} from 'vue';
+import {ref, computed} from 'vue';
 import {NSpace, NButton, NInputNumber, NCard} from 'naive-ui';
+import { t } from '@/utils/i18n';
 
 // Плейсхолдеры для основных функций
 const serverStatus = ref('unknown');
@@ -9,6 +10,9 @@ const serverStatus = ref('unknown');
 const checkServerStatus = () => {
   serverStatus.value = serverStatus.value === 'online' ? 'offline' : 'online';
 };
+
+
+
 </script>
 
 <template>
@@ -21,16 +25,17 @@ const checkServerStatus = () => {
       <div class="popup-content">
         <!-- Блок статуса сервера -->
         <NSpace vertical>
-          <h3>Состояние сервера</h3>
-          <NButton type="primary" @click="checkServerStatus">Проверить вручную</NButton>
+          <h3>{{ t('serverStatus') }}</h3>
+          <NButton type="primary" @click="checkServerStatus">{{ t('manualCheck') }}</NButton>
         </NSpace>
 
         <!-- Блок настроек -->
         <NSpace vertical>
           <NButton type="primary" tag="a" :href="browser.runtime.getURL('options.html')" target="_blank">
-            Настройки
+            {{ t('settings') }}
           </NButton>
         </NSpace>
+
       </div>
 
       <!-- Футер -->
