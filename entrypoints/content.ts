@@ -1,4 +1,3 @@
-
 export default defineContentScript({
     matches: ['*://*.google.com/*', 'https://yandex.ru/*'],
     main() {

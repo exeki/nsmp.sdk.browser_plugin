@@ -1,24 +1,15 @@
 <script lang="ts" setup>
-import { defineProps, defineEmits } from 'vue';
+import { defineProps } from 'vue';
 import { NTable, NButton, NSpace } from 'naive-ui'
 import { t } from '@/utils/i18n';
-
-interface DataItem {
-  key: number;
-  host: string;
-  project: string;
-  path: string;
-}
+import {ProjectMapping, settings} from "@/utils/settings";
 
 interface Props {
-  data: DataItem[];
+  data: Map<string, ProjectMapping>;
 }
 
 // Определение пропсов
 const props = defineProps<Props>();
-
-// Определение событий
-const emit = defineEmits(['update-data']);
 
 // Методы для редактирования и удаления
 const editProject = (item: any) => {
@@ -27,8 +18,7 @@ const editProject = (item: any) => {
 };
 
 const deleteProject = (item: any) => {
-  const newData = props.data.filter((project: any) => project.key !== item.key);
-  emit('update-data', newData);
+  settings.deleteProjectMapping(item.host);
 };
 </script>
 
@@ -43,9 +33,9 @@ const deleteProject = (item: any) => {
       </tr>
     </thead>
     <tbody>
-      <tr v-for="item in props.data" :key="item.key">
+      <tr v-for="item in props.data.values()" :key="item.host">
         <td>{{ item.host }}</td>
-        <td>{{ item.project }}</td>
+        <td>{{ item.name }}</td>
         <td>{{ item.path }}</td>
         <td>
           <NSpace size="small">

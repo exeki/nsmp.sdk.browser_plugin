@@ -43,5 +43,11 @@
   },
   "optionsPageTitle": {
     "message": "Настройки NSMP SDK"
+  },
+  "online": {
+    "message": "В сети"
+  },
+  "offline": {
+    "message": "Не в сети"
   }
 }

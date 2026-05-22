@@ -43,5 +43,11 @@
   },
   "optionsPageTitle": {
     "message": "NSMP SDK Settings"
+  },
+  "online": {
+    "message": "Online"
+  },
+  "offline": {
+    "message": "Offline"
   }
 }

@@ -9,7 +9,7 @@ const theme = computed(() => (osTheme.value === 'dark' ? darkTheme : null))
 
 <template>
   <NConfigProvider :theme="theme">
-    <NNotificationProvider :max="3">
+    <NNotificationProvider :max="3" placement="bottom-right">
       <OptionsContent/>
     </NNotificationProvider>
   </NConfigProvider>

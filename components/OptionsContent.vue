@@ -1,109 +1,99 @@
 <script setup lang="ts">
-import {ref, onMounted, watch, computed} from 'vue';
-import ProjectTable from '@/components/options/ProjectTable.vue';
-import { t } from '@/utils/i18n';
-// Состояние настроек
-const port = ref(8123);
-import {NButton, NSpace, NForm, NFormItem, NInputNumber, NCard, useNotification } from 'naive-ui'
+import {ref, onMounted, watch} from 'vue';
+import {t} from '@/utils/i18n';
+import {NButton, NSpace, NForm, NFormItem, NInputNumber, NCard, NTable} from 'naive-ui'
+import {settings, ProjectMapping, HostMapping} from '@/utils/settings';
 
-interface TableData {
-  key: number;
-  host: string;
-  project: string;
-  path: string;
-}
 
 // Данные для таблицы
-const tableData = ref<TableData[]>([
-  {
-    key: 1,
-    host: 'example.com',
-    project: 'test-project',
-    path: 'C:/projects/test'
-  }
-]);
-const notification = useNotification()
+const tableData = ref<HostMapping>({});
+const port = ref(0);
 
 // Загрузка сохраненных настроек при монтировании
 onMounted(async () => {
   try {
-    const result = await browser.storage.sync.get(['port', 'projectMappings']);
-    if (result.port !== undefined) port.value = result.port as number;
-    if (result.projectMappings) tableData.value = result.projectMappings as TableData[];
+    port.value = await settings.getPort()
+    tableData.value = await settings.getProjectMappings()
   } catch (error) {
     console.error('Failed to load settings:', error);
   }
-});
-
-// Сохранение настроек при изменении
-const saveSettings = async () => {
-  try {
-    await browser.storage.sync.set({
-      port: port.value,
-      projectMappings: tableData.value
-    });
-    console.log('Settings saved successfully');
-  } catch (error) {
-    console.error('Failed to save settings:', error);
-  }
-};
+})
 
 // Обновление настроек при изменении значений
-watch(port, saveSettings);
-watch(tableData, saveSettings, {deep: true});
+watch(port, () => settings.setPort(port.value))
+watch(tableData, () => settings.setProjectMappings(tableData.value), {deep: true})
 
 // Метод для добавления проекта
 const addProject = () => {
   // Здесь будет логика добавления проекта
   console.log('Add project clicked');
-};
-
-function test(){
-  notification.info({
-    title: `Notification index: `,
-    content: 'You can limit the index of notifications',
-    duration: 2000,
-  })
 }
 
+// Методы для редактирования и удаления
+const editProject = (item: any) => {
+  console.log('Edit project:', item);
+  // Логика редактирования
+};
+
+const deleteProject = (item: any) => {
+  settings.deleteProjectMapping(item.host);
+};
 </script>
 
 <template>
 
-    <NCard :bordered="false" class="options-container">
-      <!-- Заголовок -->
-      <template #header>
-        <h2>{{ t('optionsPageTitle') }}</h2>
-      </template>
+  <NCard :bordered="false" class="options-container">
+    <!-- Заголовок -->
+    <template #header>
+      <h2>{{ t('optionsPageTitle') }}</h2>
+    </template>
 
-    <NButton type="primary" @click="test">TEST</NButton>
+    <!-- Основное содержимое -->
+    <NSpace vertical>
+      <NForm label-placement="top">
+        <NFormItem :label="t('portSetting')">
+          <NInputNumber v-model:value="port"
+                        placeholder="Порт сервера"
+                        :min="0"
+                        :max="65535"
+                        :default-value="8123"/>
+        </NFormItem>
+      </NForm>
 
-      <!-- Основное содержимое -->
-      <NSpace vertical>
-        <NForm label-placement="top">
-          <NFormItem :label="t('portSetting')">
-            <NInputNumber
-                v-model:value="port"
-                placeholder="Порт сервера"
-                :min="0"
-                :max="65535"
-                :default-value="8123"
-            />
-          </NFormItem>
-        </NForm>
+      <h3>{{ t('projectInfo') }}</h3>
+      <NTable :bordered="true" :single-line="false" size="small">
+        <thead>
+        <tr>
+          <th>{{ t('host') }}</th>
+          <th>{{ t('project') }}</th>
+          <th>{{ t('path') }}</th>
+          <th>{{ t('actions') }}</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="item in Object.values(tableData)" :key="item.host">
+          <td>{{ item.host }}</td>
+          <td>{{ item.name }}</td>
+          <td>{{ item.path }}</td>
+          <td>
+            <NSpace size="small">
+              <NButton size="small" type="primary" @click="editProject(item)">{{ t('edit') }}</NButton>
+              <NButton size="small" type="error" @click="deleteProject(item)">{{ t('delete') }}</NButton>
+            </NSpace>
+          </td>
+        </tr>
+        </tbody>
+      </NTable>
+      <NButton type="primary" @click="addProject">{{ t('addProject') }}</NButton>
+    </NSpace>
 
-        <h3>{{ t('projectInfo') }}</h3>
-        <ProjectTable :data="tableData"/>
-        <NButton type="primary" @click="addProject">{{ t('addProject') }}</NButton>
-      </NSpace>
-
-      <!-- Футер -->
-      <template #footer>
-        <div class="options-footer">
-          <small>NSMP SDK Browser Plugin</small>
-        </div>
-      </template>
-    </NCard>
+    <!-- Футер -->
+    <template #footer>
+      <div class="options-footer">
+        <small>NSMP SDK Browser Plugin</small>
+      </div>
+    </template>
+  </NCard>
 </template>
 
 <style scoped>
