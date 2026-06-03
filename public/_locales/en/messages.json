@@ -49,5 +49,23 @@
   },
   "offline": {
     "message": "Offline"
+  },
+  "historyTitle": {
+    "message": "Change history"
+  },
+  "historyExpand": {
+    "message": "Expand history panel"
+  },
+  "historyCollapse": {
+    "message": "Collapse history panel"
+  },
+  "historyLoading": {
+    "message": "Loading…"
+  },
+  "historyEmpty": {
+    "message": "No history entries"
+  },
+  "historyEnd": {
+    "message": "End of list"
   }
 }

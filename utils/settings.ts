@@ -1,9 +1,11 @@
 const PORT_KEY = "port"
 const PROJECT_MAPPINGS_KEY = "projectMappings"
+const HISTORY_PANEL_COLLAPSED_KEY = "historyPanelCollapsed"
 
 const DEFAULT_SETTINGS = {
     [PORT_KEY]: 8123,
-    [PROJECT_MAPPINGS_KEY]: {}
+    [PROJECT_MAPPINGS_KEY]: {},
+    [HISTORY_PANEL_COLLAPSED_KEY]: false,
 }
 
 interface ProjectMapping {
@@ -63,6 +65,15 @@ class Settings {
         const projectMappings = await this.getProjectMappings()
         delete projectMappings[(host)]
         await this.setProjectMappings(projectMappings)
+    }
+
+    async getHistoryPanelCollapsed(): Promise<boolean> {
+        const stored = (await browser.storage.local.get(HISTORY_PANEL_COLLAPSED_KEY))[HISTORY_PANEL_COLLAPSED_KEY]
+        return stored === true
+    }
+
+    async setHistoryPanelCollapsed(collapsed: boolean): Promise<void> {
+        await browser.storage.local.set({[HISTORY_PANEL_COLLAPSED_KEY]: collapsed})
     }
 }
 

@@ -49,5 +49,23 @@
   },
   "offline": {
     "message": "Не в сети"
+  },
+  "historyTitle": {
+    "message": "История изменений"
+  },
+  "historyExpand": {
+    "message": "Развернуть панель истории"
+  },
+  "historyCollapse": {
+    "message": "Свернуть панель истории"
+  },
+  "historyLoading": {
+    "message": "Загрузка…"
+  },
+  "historyEmpty": {
+    "message": "Записей истории нет"
+  },
+  "historyEnd": {
+    "message": "Конец списка"
   }
 }
