@@ -82,6 +82,7 @@ export default defineBackground(() => {
 })
 
 browser.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+    console.log("browser.tabs.onUpdated")
     if (changeInfo.status === 'complete' && tab.active && tab.url) {
         browser.runtime.sendMessage({
             type: 'URL_UPDATED',
@@ -91,6 +92,7 @@ browser.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
 })
 
 browser.tabs.onActivated.addListener(async (activeInfo) => {
+    console.log("browser.tabs.onActivate")
     const tab = await browser.tabs.get(activeInfo.tabId);
     browser.runtime.sendMessage({
         type: 'URL_UPDATED',

@@ -1,5 +1,5 @@
 export default defineContentScript({
-    matches: ['*://*.google.com/*', 'https://yandex.ru/*'],
+    matches: ['*://*/sd/admin/*'],
     main() {
         console.log('Hello content.');
         browser.runtime.sendMessage({

@@ -8,6 +8,6 @@ export default defineConfig({
         options_page: 'options.html',
         default_locale: 'en',
         permissions: ["notifications", "alarms", "storage", "tabs"],
-        host_permissions: ['*://*.google.com/*', '*://yandex.ru/*', "*://127.0.0.1:*/*"]
+        host_permissions: ['*://*.google.com/*', '*://yandex.ru/*', "*://127.0.0.1:*/*", '*://*/sd/admin/*']
     },
 })

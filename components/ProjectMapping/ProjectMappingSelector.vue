@@ -7,15 +7,19 @@ import Project from "@/utils/model/Project";
 
 browser.runtime.onMessage.addListener((msg) => {
   if (msg.type === 'URL_UPDATED' && msg.url && msg.url.startsWith('http')) {
-    const newHost = new URL(msg.url).hostname
-    if (currentHost.value != newHost) {
-      loadProjects()
-      console.log(`URL updated to ${newHost}`)
-      currentMapping.value = mappings.value[newHost]
-      currentHost.value = newHost
-    }
+    updateHost(msg.url)
   }
 })
+
+function updateHost(url: string) {
+  const newHost = new URL(url).hostname
+  if (currentHost.value != newHost) {
+    loadProjects()
+    console.log(`URL updated to ${newHost}`)
+    currentMapping.value = mappings.value[newHost]
+    currentHost.value = newHost
+  }
+}
 
 // Реактивные данные
 const mappings = ref<HostMapping>({})
@@ -54,6 +58,10 @@ const handleSelect = (path: string | null) => {
 onMounted(() => {
   loadMappings()
   loadProjects()
+  browser.tabs.query({active: true, currentWindow: true}).then(tabs => {
+    const tab = tabs[0]
+    if (tab != undefined && tab.url != undefined) updateHost(tab.url)
+  })
 })
 
 // Загрузка проектов

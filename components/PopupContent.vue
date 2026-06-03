@@ -21,8 +21,6 @@ const handleManualCheck = async () => {
   )
 };
 
-// Текущий хост
-const currentHost = location.hostname;
 
 // Обработка обновления маппинга
 const onMappingUpdated = () => {
@@ -61,7 +59,7 @@ onUnmounted(() => {
       </NSpace>
 
       <!-- Блок маппинга проектов -->
-      <ProjectMappingSelector :current-host="currentHost" @mapping-updated="onMappingUpdated" />
+      <ProjectMappingSelector @mapping-updated="onMappingUpdated" />
 
     </div>
 
