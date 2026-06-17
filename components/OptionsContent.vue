@@ -1,26 +1,26 @@
 <script setup lang="ts">
 import {ref, onMounted, watch} from 'vue';
 import {t} from '@/utils/i18n';
-import {NButton, NSpace, NForm, NFormItem, NInputNumber, NCard, NTable} from 'naive-ui'
+import {NButton, NSpace, NForm, NFormItem, NInputNumber, NCard, NTable, NSwitch} from 'naive-ui'
 import {settings, ProjectMapping, HostMapping} from '@/utils/settings';
 
 
-// Данные для таблицы
 const tableData = ref<HostMapping>({});
 const port = ref(0);
+const notificationsEnabled = ref(true);
 
-// Загрузка сохраненных настроек при монтировании
 onMounted(async () => {
   try {
     port.value = await settings.getPort()
+    notificationsEnabled.value = await settings.getNotificationsEnabled()
     tableData.value = await settings.getProjectMappings()
   } catch (error) {
     console.error('Failed to load settings:', error);
   }
 })
 
-// Обновление настроек при изменении значений
 watch(port, () => settings.setPort(port.value))
+watch(notificationsEnabled, (value) => settings.setNotificationsEnabled(value))
 watch(tableData, () => settings.setProjectMappings(tableData.value), {deep: true})
 
 // Метод для добавления проекта
@@ -57,6 +57,9 @@ const deleteProject = (item: any) => {
                         :min="0"
                         :max="65535"
                         :default-value="8123"/>
+        </NFormItem>
+        <NFormItem :label="t('notificationsSetting')">
+          <NSwitch v-model:value="notificationsEnabled"/>
         </NFormItem>
       </NForm>
 

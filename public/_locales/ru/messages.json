@@ -11,6 +11,9 @@
   "portSetting": {
     "message": "Порт локального сервера"
   },
+  "notificationsSetting": {
+    "message": "Оповещения"
+  },
   "projectInfo": {
     "message": "Информация о локальных проектах"
   },
@@ -67,5 +70,44 @@
   },
   "historyEnd": {
     "message": "Конец списка"
+  },
+  "serverLabel": {
+    "message": "SERVER"
+  },
+  "currentHost": {
+    "message": "Current host:"
+  },
+  "currentSrc": {
+    "message": "Current src:"
+  },
+  "pull": {
+    "message": "Pull"
+  },
+  "none": {
+    "message": "none"
+  },
+  "selectProject": {
+    "message": "Выберите проект…"
+  },
+  "projectsLoadFailed": {
+    "message": "Не удалось загрузить проекты"
+  },
+  "serverPortDisabled": {
+    "message": "Локальный сервер отключён (порт 0)"
+  },
+  "pullSuccessTitle": {
+    "message": "Pull запущен"
+  },
+  "pullSuccessMessage": {
+    "message": "Задача pull успешно запущена"
+  },
+  "pullErrorTitle": {
+    "message": "Ошибка pull"
+  },
+  "pullErrorMessage": {
+    "message": "Не удалось запустить задачу pull"
+  },
+  "pullNoProject": {
+    "message": "Сначала выберите проект для текущего хоста"
   }
 }

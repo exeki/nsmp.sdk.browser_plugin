@@ -1,17 +1,26 @@
+import {settings} from '@/utils/settings';
+
+async function show(title: string, message: string): Promise<void> {
+    if (!(await settings.getNotificationsEnabled())) return;
+
+    await browser.notifications.create({
+        type: 'basic',
+        iconUrl: 'icon/96.png',
+        title,
+        message,
+    });
+}
+
 class NotificationService {
     info(title: string, message: string) {
-        browser.notifications.create(
-            'info',
-            {
-                type: 'basic',
-                iconUrl: 'icon/96.png',
-                title: title,
-                message: message
-            }
-        )
+        void show(title, message);
+    }
+
+    error(title: string, message: string) {
+        void show(title, message);
     }
 }
 
 const notifications = new NotificationService()
 
-export {notifications}
+export {notifications, show};

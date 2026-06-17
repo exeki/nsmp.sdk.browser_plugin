@@ -1,4 +1,8 @@
-let serverStatus = 'unknown';
+import {checkHealth} from '@/utils/localServiceConnector';
+import {Messages, isRuntimeMessage, type ServerStatus} from '@/utils/messages';
+import {show} from '@/utils/notifications';
+
+let serverStatus: ServerStatus | 'unknown' = 'unknown';
 
 const updateIcon = () => {
     const iconPath = serverStatus === 'online'
@@ -7,95 +11,55 @@ const updateIcon = () => {
 
     browser.action.setIcon({
         path: {
-            "16": iconPath.replace('128', '16'),
-            "32": iconPath.replace('128', '32'),
-            "48": iconPath.replace('128', '48'),
-            "96": iconPath.replace('128', '96'),
-            "128": iconPath
-        }
-    }).catch(err => console.error('Failed to set icon:', err));
-}
+            '16': iconPath.replace('128', '16'),
+            '32': iconPath.replace('128', '32'),
+            '48': iconPath.replace('128', '48'),
+            '96': iconPath.replace('128', '96'),
+            '128': iconPath,
+        },
+    }).catch(err => console.log('Failed to set icon', err));
+};
 
-// Инициализация при старте
+const broadcastStatus = (status: ServerStatus) => {
+    browser.runtime.sendMessage(Messages.serverStatusUpdate(status)).catch(() => {});
+};
+
 export default defineBackground(() => {
-    console.log('Hello background!', {id: browser.runtime.id});
-
-    // Устанавливаем начальную иконку
     updateIcon();
 
-    // Слушаем сообщения от popup
     browser.runtime.onMessage.addListener((msg) => {
+        if (!isRuntimeMessage(msg)) return;
+
         if (msg.type === 'SHOW_NOTIFICATION') {
-            console.log("Got notification event")
-            browser.notifications.create({
-                type: 'basic',
-                iconUrl: 'icon/128.png',
-                title: msg.payload.title,
-                message: msg.payload.message,
-            });
+            void show(msg.payload.title, msg.payload.message);
         } else if (msg.type === 'SERVER_STATUS_UPDATE') {
             serverStatus = msg.status;
             updateIcon();
         }
-    })
+    });
 
-    // Периодическая проверка каждые 10 секунд
     setInterval(async () => {
-        try {
-            const port = (await browser.storage.local.get('port')).port || 8123;
+        const port = (await browser.storage.local.get('port')).port ?? 8123;
+        const online = await checkHealth(Number(port));
+        const newStatus: ServerStatus = online ? 'online' : 'offline';
 
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 5000);
-
-            const response = await fetch(`http://127.0.0.1:${port}/`, {
-                method: 'GET',
-                signal: controller.signal,
-            })
-
-            clearTimeout(timeoutId);
-
-            const newStatus = response.ok ? 'online' : 'offline';
-            if (newStatus !== serverStatus) {
-                serverStatus = newStatus;
-                updateIcon();
-
-                // Оповещаем popup, если нужно
-                browser.runtime.sendMessage({
-                    type: 'SERVER_STATUS_UPDATE',
-                    status: serverStatus
-                }).catch(() => {
-                })
-            }
-        } catch (error) {
-            if (serverStatus !== 'offline') {
-                serverStatus = 'offline';
-                updateIcon();
-
-                browser.runtime.sendMessage({
-                    type: 'SERVER_STATUS_UPDATE',
-                    status: serverStatus
-                }).catch(() => {
-                })
-            }
+        if (newStatus !== serverStatus) {
+            serverStatus = newStatus;
+            updateIcon();
+            broadcastStatus(newStatus);
         }
     }, 10000);
-})
+});
 
-browser.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
-    console.log("browser.tabs.onUpdated")
+browser.tabs.onUpdated.addListener((_tabId, changeInfo, tab) => {
     if (changeInfo.status === 'complete' && tab.active && tab.url) {
-        browser.runtime.sendMessage({
-            type: 'URL_UPDATED',
-            url: tab.url
-        })
+        browser.runtime.sendMessage(Messages.urlUpdated(tab.url)).catch(() => {});
     }
-})
+});
 
 browser.tabs.onActivated.addListener(async (activeInfo) => {
-    console.log("browser.tabs.onActivate")
     const tab = await browser.tabs.get(activeInfo.tabId);
-    browser.runtime.sendMessage({
-        type: 'URL_UPDATED',
-        url: tab.url
-    })
-})
+    if (tab.url) {
+        browser.runtime.sendMessage(Messages.urlUpdated(tab.url)).catch(() => {});
+    }
+});

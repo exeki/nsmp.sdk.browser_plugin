@@ -11,6 +11,9 @@
   "portSetting": {
     "message": "Local server port"
   },
+  "notificationsSetting": {
+    "message": "Notifications"
+  },
   "projectInfo": {
     "message": "Local projects information"
   },
@@ -67,5 +70,44 @@
   },
   "historyEnd": {
     "message": "End of list"
+  },
+  "serverLabel": {
+    "message": "SERVER"
+  },
+  "currentHost": {
+    "message": "Current host:"
+  },
+  "currentSrc": {
+    "message": "Current src:"
+  },
+  "pull": {
+    "message": "Pull"
+  },
+  "none": {
+    "message": "none"
+  },
+  "selectProject": {
+    "message": "Select project…"
+  },
+  "projectsLoadFailed": {
+    "message": "Failed to load projects"
+  },
+  "serverPortDisabled": {
+    "message": "Local server is disabled (port 0)"
+  },
+  "pullSuccessTitle": {
+    "message": "Pull started"
+  },
+  "pullSuccessMessage": {
+    "message": "Pull task has been started successfully"
+  },
+  "pullErrorTitle": {
+    "message": "Pull failed"
+  },
+  "pullErrorMessage": {
+    "message": "Failed to start pull task"
+  },
+  "pullNoProject": {
+    "message": "Select a project for the current host first"
   }
 }

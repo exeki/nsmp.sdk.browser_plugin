@@ -1,11 +1,13 @@
 const PORT_KEY = "port"
 const PROJECT_MAPPINGS_KEY = "projectMappings"
 const HISTORY_PANEL_COLLAPSED_KEY = "historyPanelCollapsed"
+const NOTIFICATIONS_ENABLED_KEY = "notificationsEnabled"
 
 const DEFAULT_SETTINGS = {
     [PORT_KEY]: 8123,
     [PROJECT_MAPPINGS_KEY]: {},
     [HISTORY_PANEL_COLLAPSED_KEY]: false,
+    [NOTIFICATIONS_ENABLED_KEY]: true,
 }
 
 interface ProjectMapping {
@@ -74,6 +76,15 @@ class Settings {
 
     async setHistoryPanelCollapsed(collapsed: boolean): Promise<void> {
         await browser.storage.local.set({[HISTORY_PANEL_COLLAPSED_KEY]: collapsed})
+    }
+
+    async getNotificationsEnabled(): Promise<boolean> {
+        const stored = (await browser.storage.local.get(NOTIFICATIONS_ENABLED_KEY))[NOTIFICATIONS_ENABLED_KEY]
+        return stored !== false
+    }
+
+    async setNotificationsEnabled(enabled: boolean): Promise<void> {
+        await browser.storage.local.set({[NOTIFICATIONS_ENABLED_KEY]: enabled})
     }
 }
 
