@@ -9,7 +9,7 @@ import {settings} from '@/utils/settings';
 
 const CHECK_INTERVAL_MS = 10000;
 const ICON_ONLINE = 'icon/128.png';
-const ICON_OFFLINE = 'icon/128.png';
+const ICON_OFFLINE = 'icon-gray/128.png';
 
 let serverStatus: ServerStatus | 'unknown' = 'unknown';
 

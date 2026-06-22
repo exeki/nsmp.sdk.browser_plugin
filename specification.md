@@ -35,7 +35,7 @@ Chrome, Safari, Firefox. Только MV3.
 - Ответ на `GET_SERVER_STATUS` — текущий статус.
 - Отслеживание активной вкладки: `URL_UPDATED` при смене/загрузке вкладки.
 - Реакция на смену порта в storage — немедленная перепроверка.
-- Иконка расширения: цветная при online, серая при offline (когда будет добавлена серая иконка).
+- Иконка расширения: цветная (`public/icon/`) при online, серая (`public/icon-gray/`) при offline.
 
 ## Локальный сервис (`utils/localServiceConnector.ts`)
 Все HTTP-запросы к локальному серверу:
@@ -83,4 +83,6 @@ Popup подписан на `URL_UPDATED` и `SERVER_STATUS_UPDATE`. Стату�
 3. Таблица маппингов host → project → path с кнопками добавить, редактировать, удалить.
 
 # Иконка
-Базовая заготовка: `icons/nsmp_logo_colored.svg`.
+Исходники: `icons/nsmp_logo_colored.svg`, `icons/nsmp_logo_gray.svg`.
+PNG для расширения: `public/icon/` (online), `public/icon-gray/` (offline).
+Генерация: `npm run icons:generate`.
