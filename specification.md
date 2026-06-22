@@ -9,7 +9,7 @@
 - Safari (MVP): только ручная установка через Xcode / safari-web-extension-converter, без App Store.
 - API: только `browser.*` (кроссплатформенно), без chrome-only.
 - `host_permissions`: `http://127.0.0.1/*` и `*://*/sd/admin/*`.
-- `permissions`: `notifications`, `storage`, `tabs`.
+- `permissions`: `alarms`, `notifications`, `storage`, `tabs`.
 
 # Совместимость
 Chrome, Safari, Firefox. Только MV3.
@@ -29,7 +29,7 @@ Chrome, Safari, Firefox. Только MV3.
 # Архитектура
 
 ## Background (`entrypoints/background.ts`)
-- Проверка локального сервера каждые 10 секунд (`GET http://127.0.0.1:{port}/`).
+- Периодическая проверка локального сервера через `browser.alarms` (интервал ~10 сек, `GET http://127.0.0.1:{port}/`).
 - Ручная проверка по сообщению `CHECK_SERVER`.
 - Рассылка `SERVER_STATUS_UPDATE` при смене статуса.
 - Ответ на `GET_SERVER_STATUS` — текущий статус.

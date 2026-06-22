@@ -100,11 +100,5 @@
   },
   "hostRequired": {
     "message": "Host is required"
-  },
-  "nameRequired": {
-    "message": "Project name is required"
-  },
-  "pathRequired": {
-    "message": "Path is required"
   }
 }

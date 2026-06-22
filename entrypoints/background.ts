@@ -7,7 +7,8 @@ import {
 } from '@/utils/messages';
 import {settings} from '@/utils/settings';
 
-const CHECK_INTERVAL_MS = 10000;
+const CHECK_ALARM_NAME = 'server-health-check';
+const CHECK_PERIOD_MINUTES = 10 / 60;
 const ICON_ONLINE = 'icon/128.png';
 const ICON_OFFLINE = 'icon-gray/128.png';
 
@@ -45,8 +46,16 @@ const runHealthCheck = async (forceBroadcast = false): Promise<ServerStatus> => 
     return newStatus;
 };
 
+const scheduleHealthCheckAlarm = async (): Promise<void> => {
+    await browser.alarms.clear(CHECK_ALARM_NAME);
+    await browser.alarms.create(CHECK_ALARM_NAME, {
+        periodInMinutes: CHECK_PERIOD_MINUTES,
+    });
+};
+
 export default defineBackground(() => {
     updateIcon();
+    void scheduleHealthCheckAlarm();
     void runHealthCheck(true);
 
     browser.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
@@ -68,6 +77,12 @@ export default defineBackground(() => {
         }
     });
 
+    browser.alarms.onAlarm.addListener((alarm) => {
+        if (alarm.name === CHECK_ALARM_NAME) {
+            void runHealthCheck();
+        }
+    });
+
     browser.storage.onChanged.addListener((changes, area) => {
         if (area !== 'local') return;
 
@@ -80,10 +95,6 @@ export default defineBackground(() => {
             settings.clearProjectMappingsCache();
         }
     });
-
-    setInterval(() => {
-        void runHealthCheck();
-    }, CHECK_INTERVAL_MS);
 
     browser.tabs.onUpdated.addListener((_tabId, changeInfo, tab) => {
         if (changeInfo.status === 'complete' && tab.active && tab.url) {

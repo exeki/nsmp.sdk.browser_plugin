@@ -100,11 +100,5 @@
   },
   "hostRequired": {
     "message": "Укажите хост"
-  },
-  "nameRequired": {
-    "message": "Укажите имя проекта"
-  },
-  "pathRequired": {
-    "message": "Укажите путь"
   }
 }
