@@ -12,7 +12,14 @@ import {
   NTable,
   NSwitch,
   NModal,
+  NSelect,
 } from 'naive-ui';
+import {getProjects, type Project} from '@/utils/localServiceConnector';
+import {
+  applyProjectMapping,
+  buildProjectSelectOptions,
+  filterProjectsByHost,
+} from '@/utils/projectMapping';
 import {settings, type HostMapping, type ProjectMapping} from '@/utils/settings';
 
 const tableData = ref<HostMapping>({});
@@ -21,17 +28,60 @@ const notificationsEnabled = ref(true);
 
 const modalVisible = ref(false);
 const editingHost = ref<string | null>(null);
+const editingMapping = ref<ProjectMapping | null>(null);
 const formHost = ref('');
-const formName = ref('');
-const formPath = ref('');
+const selectedProjectPath = ref<string | null>(null);
+const projects = ref<Project[]>([]);
+const projectsLoading = ref(false);
+const projectsError = ref<string | null>(null);
 const formError = ref<string | null>(null);
 
 const isEditing = computed(() => editingHost.value !== null);
 const modalTitle = computed(() => (isEditing.value ? t('editProjectTitle') : t('addProjectTitle')));
 
+const projectOptions = computed(() =>
+    buildProjectSelectOptions(projects.value, selectedProjectPath.value, editingMapping.value),
+);
+
 async function reloadMappings(): Promise<void> {
   settings.clearProjectMappingsCache();
   tableData.value = await settings.getProjectMappings();
+}
+
+async function loadModalProjects(host: string): Promise<void> {
+  const trimmedHost = host.trim();
+  if (!trimmedHost) {
+    projects.value = [];
+    projectsError.value = null;
+    return;
+  }
+
+  projectsLoading.value = true;
+  projectsError.value = null;
+
+  try {
+    const currentPort = port.value || await settings.getPort();
+    if (currentPort === 0) {
+      projects.value = [];
+      projectsError.value = t('serverPortDisabled');
+      return;
+    }
+
+    const data = await getProjects(currentPort);
+    projects.value = filterProjectsByHost(data, trimmedHost);
+  } catch {
+    projects.value = [];
+    projectsError.value = t('projectsLoadFailed');
+  } finally {
+    projectsLoading.value = false;
+  }
+}
+
+function refreshModalProjects(): void {
+  const host = formHost.value.trim();
+  if (modalVisible.value && host) {
+    void loadModalProjects(host);
+  }
 }
 
 function onStorageChanged(
@@ -54,8 +104,28 @@ onMounted(async () => {
   browser.storage.onChanged.addListener(onStorageChanged);
 });
 
-watch(port, () => settings.setPort(port.value));
+watch(port, () => {
+  settings.setPort(port.value);
+  refreshModalProjects();
+});
+
 watch(notificationsEnabled, (value) => settings.setNotificationsEnabled(value));
+
+watch(modalVisible, (visible) => {
+  if (visible) refreshModalProjects();
+});
+
+watch(() => formHost.value.trim(), (host) => {
+  if (!modalVisible.value) return;
+
+  if (host) {
+    void loadModalProjects(host);
+  } else {
+    projects.value = [];
+    selectedProjectPath.value = null;
+    projectsError.value = null;
+  }
+});
 
 onUnmounted(() => {
   browser.storage.onChanged.removeListener(onStorageChanged);
@@ -63,9 +133,12 @@ onUnmounted(() => {
 
 function resetForm(): void {
   editingHost.value = null;
+  editingMapping.value = null;
   formHost.value = '';
-  formName.value = '';
-  formPath.value = '';
+  selectedProjectPath.value = null;
+  projects.value = [];
+  projectsLoading.value = false;
+  projectsError.value = null;
   formError.value = null;
 }
 
@@ -75,11 +148,11 @@ function openAddModal(): void {
 }
 
 function openEditModal(item: ProjectMapping): void {
+  resetForm();
   editingHost.value = item.host;
+  editingMapping.value = item;
   formHost.value = item.host;
-  formName.value = item.name;
-  formPath.value = item.path;
-  formError.value = null;
+  selectedProjectPath.value = item.path;
   modalVisible.value = true;
 }
 
@@ -88,37 +161,29 @@ function closeModal(): void {
   resetForm();
 }
 
-function validateForm(): boolean {
-  if (!formHost.value.trim()) {
-    formError.value = t('hostRequired');
-    return false;
-  }
-  if (!formName.value.trim()) {
-    formError.value = t('nameRequired');
-    return false;
-  }
-  if (!formPath.value.trim()) {
-    formError.value = t('pathRequired');
-    return false;
-  }
-  formError.value = null;
-  return true;
-}
-
 async function saveProject(): Promise<void> {
-  if (!validateForm()) return;
+  const host = formHost.value.trim();
 
-  const mapping: ProjectMapping = {
-    host: formHost.value.trim(),
-    name: formName.value.trim(),
-    path: formPath.value.trim(),
-  };
+  if (!host) {
+    formError.value = t('hostRequired');
+    return;
+  }
 
-  if (isEditing.value && editingHost.value !== mapping.host) {
+  if (!selectedProjectPath.value) {
+    formError.value = t('selectProject');
+    return;
+  }
+
+  const mapping = await applyProjectMapping(host, selectedProjectPath.value, projects.value);
+  if (!mapping) {
+    formError.value = t('projectsLoadFailed');
+    return;
+  }
+
+  if (isEditing.value && editingHost.value !== host) {
     await settings.deleteProjectMapping(editingHost.value!);
   }
 
-  await settings.setProjectMapping(mapping);
   await reloadMappings();
   closeModal();
 }
@@ -129,6 +194,11 @@ async function deleteProject(item: ProjectMapping): Promise<void> {
   await settings.deleteProjectMapping(item.host);
   await reloadMappings();
 }
+
+async function onProjectSelect(path: string | null): Promise<void> {
+  selectedProjectPath.value = path;
+}
+
 </script>
 
 <template>
@@ -190,17 +260,21 @@ async function deleteProject(item: ProjectMapping): Promise<void> {
       preset="card"
       :title="modalTitle"
       style="width: 480px"
-      @after-leave="resetForm"
-  >
+      @after-leave="resetForm">
     <NForm label-placement="top">
       <NFormItem :label="t('host')">
         <NInput v-model:value="formHost" :disabled="isEditing"/>
       </NFormItem>
       <NFormItem :label="t('project')">
-        <NInput v-model:value="formName"/>
-      </NFormItem>
-      <NFormItem :label="t('path')">
-        <NInput v-model:value="formPath"/>
+    <NSelect :value="selectedProjectPath"
+            :options="projectOptions"
+            :loading="projectsLoading"
+            :placeholder="t('selectProject')"
+            :to="false"
+            filterable
+            clearable
+           @update:value="onProjectSelect"/>
+        <p v-if="projectsError" class="form-error">{{ projectsError }}</p>
       </NFormItem>
       <p v-if="formError" class="form-error">{{ formError }}</p>
     </NForm>
@@ -233,7 +307,7 @@ async function deleteProject(item: ProjectMapping): Promise<void> {
 }
 
 .form-error {
-  margin: 0;
+  margin: 4px 0 0;
   font-size: 12px;
   color: #d03050;
 }

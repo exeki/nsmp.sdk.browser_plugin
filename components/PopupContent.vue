@@ -4,6 +4,11 @@ import {NButton, NSelect} from 'naive-ui';
 import {t} from '@/utils/i18n';
 import {extractNsdHost, parseSrcPage, type SrcPageContext} from '@/utils/nsdUrl';
 import {getProjects, pull, type Project} from '@/utils/localServiceConnector';
+import {
+  applyProjectMapping,
+  buildProjectSelectOptions,
+  filterProjectsByHost,
+} from '@/utils/projectMapping';
 import {notifications} from '@/utils/notifications';
 import {isRuntimeMessage} from '@/utils/messages';
 import {settings, type ProjectMapping} from '@/utils/settings';
@@ -23,22 +28,9 @@ const projectsLoading = ref(false);
 const projectsError = ref<string | null>(null);
 const pulling = ref(false);
 
-const projectOptions = computed(() => {
-  const opts = projects.value.map(p => ({
-    label: `${p.name} — ${p.basePath}`,
-    value: p.basePath,
-  }));
-
-  const path = selectedProjectPath.value;
-  if (path && !opts.some(o => o.value === path) && currentMapping.value) {
-    opts.unshift({
-      label: `${currentMapping.value.name} — ${currentMapping.value.path}`,
-      value: currentMapping.value.path,
-    });
-  }
-
-  return opts;
-});
+const projectOptions = computed(() =>
+    buildProjectSelectOptions(projects.value, selectedProjectPath.value, currentMapping.value),
+);
 
 const pullDisabled = computed(() =>
     !currentSrcContext.value
@@ -110,7 +102,7 @@ async function loadProjects(host: string): Promise<void> {
     }
 
     const data = await getProjects(port.value);
-    projects.value = data.filter(p => p.nsmpSdk.installationHost === host);
+    projects.value = filterProjectsByHost(data, host);
   } catch {
     projects.value = [];
     projectsError.value = t('projectsLoadFailed');
@@ -130,16 +122,9 @@ async function onProjectSelect(path: string | null): Promise<void> {
     return;
   }
 
-  const project = projects.value.find(p => p.basePath === path);
-  if (!project) return;
+  const mapping = await applyProjectMapping(host, path, projects.value);
+  if (!mapping) return;
 
-  const mapping: ProjectMapping = {
-    host,
-    name: project.name,
-    path: project.basePath,
-  };
-
-  await settings.setProjectMapping(mapping);
   currentMapping.value = mapping;
   selectedProjectPath.value = path;
 }
@@ -234,8 +219,7 @@ onUnmounted(() => {
       <section class="field">
         <div class="field__label">{{ t('project') }}</div>
         <div class="field__value">
-          <NSelect
-              :value="selectedProjectPath"
+          <NSelect :value="selectedProjectPath"
               :options="projectOptions"
               :loading="projectsLoading"
               :disabled="!currentHost"
@@ -243,8 +227,7 @@ onUnmounted(() => {
               filterable
               clearable
               size="small"
-              @update:value="onProjectSelect"
-          />
+              @update:value="onProjectSelect"/>
           <p v-if="projectsError" class="field__error">{{ projectsError }}</p>
         </div>
       </section>
