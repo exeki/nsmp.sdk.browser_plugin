@@ -5,9 +5,6 @@
   "settings": {
     "message": "Настройки"
   },
-  "languageSelector": {
-    "message": "Язык"
-  },
   "portSetting": {
     "message": "Порт локального сервера"
   },
@@ -38,12 +35,6 @@
   "addProject": {
     "message": "Добавить проект"
   },
-  "serverStatus": {
-    "message": "Состояние сервера"
-  },
-  "manualCheck": {
-    "message": "Проверить вручную"
-  },
   "optionsPageTitle": {
     "message": "Настройки NSMP SDK"
   },
@@ -53,38 +44,20 @@
   "offline": {
     "message": "Не в сети"
   },
-  "historyTitle": {
-    "message": "История изменений"
-  },
-  "historyExpand": {
-    "message": "Развернуть панель истории"
-  },
-  "historyCollapse": {
-    "message": "Свернуть панель истории"
-  },
-  "historyLoading": {
-    "message": "Загрузка…"
-  },
-  "historyEmpty": {
-    "message": "Записей истории нет"
-  },
-  "historyEnd": {
-    "message": "Конец списка"
-  },
   "serverLabel": {
     "message": "SERVER"
   },
   "currentHost": {
-    "message": "Current host:"
+    "message": "Текущий хост:"
   },
   "currentSrc": {
-    "message": "Current src:"
+    "message": "Текущий src:"
   },
   "pull": {
     "message": "Pull"
   },
   "none": {
-    "message": "none"
+    "message": "нет"
   },
   "selectProject": {
     "message": "Выберите проект…"
@@ -109,5 +82,29 @@
   },
   "pullNoProject": {
     "message": "Сначала выберите проект для текущего хоста"
+  },
+  "save": {
+    "message": "Сохранить"
+  },
+  "cancel": {
+    "message": "Отмена"
+  },
+  "addProjectTitle": {
+    "message": "Добавить маппинг проекта"
+  },
+  "editProjectTitle": {
+    "message": "Редактировать маппинг"
+  },
+  "confirmDelete": {
+    "message": "Удалить этот маппинг?"
+  },
+  "hostRequired": {
+    "message": "Укажите хост"
+  },
+  "nameRequired": {
+    "message": "Укажите имя проекта"
+  },
+  "pathRequired": {
+    "message": "Укажите путь"
   }
 }

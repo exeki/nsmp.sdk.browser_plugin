@@ -13,15 +13,11 @@ export interface Project {
     basePath: string;
     nsmpSdk: {
         installationHost: string;
-    }
+    };
 }
 
 interface ProjectsResponse {
     projects: Project[];
-}
-
-interface ProjectByPathResponse {
-    project: Project;
 }
 
 function buildUrl(port: number, path: string): string {
@@ -67,22 +63,6 @@ export async function getProjects(port: number): Promise<Project[]> {
 
     const data = (await response.json()) as ProjectsResponse;
     return (data.projects ?? []).filter(p => p.nsmpSdk);
-}
-
-export async function getProjectByPath(port: number, path: string): Promise<Project> {
-    const response = await request(port, '/projects/by-path', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({path}),
-    });
-
-    if (!response.ok) {
-        console.log('POST /projects/by-path failed', response.status);
-        throw new Error('Failed to fetch project by path');
-    }
-
-    const data = (await response.json()) as ProjectByPathResponse;
-    return data.project;
 }
 
 export async function pull(port: number, body: PullRequest): Promise<void> {

@@ -10,25 +10,31 @@ export type ServerStatusUpdateMessage = {
     status: ServerStatus;
 };
 
-export type ShowNotificationMessage = {
-    type: 'SHOW_NOTIFICATION';
-    payload: {
-        title: string;
-        message: string;
-    };
+export type GetServerStatusMessage = {
+    type: 'GET_SERVER_STATUS';
+};
+
+export type CheckServerMessage = {
+    type: 'CHECK_SERVER';
+};
+
+export type ServerStatusResponse = {
+    status: ServerStatus;
 };
 
 export type RuntimeMessage =
     | UrlUpdatedMessage
     | ServerStatusUpdateMessage
-    | ShowNotificationMessage;
+    | GetServerStatusMessage
+    | CheckServerMessage;
 
 export function isRuntimeMessage(msg: unknown): msg is RuntimeMessage {
     if (typeof msg !== 'object' || msg === null || !('type' in msg)) return false;
     const type = (msg as { type: unknown }).type;
     return type === 'URL_UPDATED'
         || type === 'SERVER_STATUS_UPDATE'
-        || type === 'SHOW_NOTIFICATION';
+        || type === 'GET_SERVER_STATUS'
+        || type === 'CHECK_SERVER';
 }
 
 export const Messages = {
@@ -38,7 +44,10 @@ export const Messages = {
     serverStatusUpdate(status: ServerStatus): ServerStatusUpdateMessage {
         return {type: 'SERVER_STATUS_UPDATE', status};
     },
-    showNotification(title: string, message: string): ShowNotificationMessage {
-        return {type: 'SHOW_NOTIFICATION', payload: {title, message}};
+    getServerStatus(): GetServerStatusMessage {
+        return {type: 'GET_SERVER_STATUS'};
+    },
+    checkServer(): CheckServerMessage {
+        return {type: 'CHECK_SERVER'};
     },
 };

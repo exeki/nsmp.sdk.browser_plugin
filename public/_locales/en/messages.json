@@ -5,9 +5,6 @@
   "settings": {
     "message": "Settings"
   },
-  "languageSelector": {
-    "message": "Language"
-  },
   "portSetting": {
     "message": "Local server port"
   },
@@ -38,12 +35,6 @@
   "addProject": {
     "message": "Add project"
   },
-  "serverStatus": {
-    "message": "Server status"
-  },
-  "manualCheck": {
-    "message": "Check manually"
-  },
   "optionsPageTitle": {
     "message": "NSMP SDK Settings"
   },
@@ -52,24 +43,6 @@
   },
   "offline": {
     "message": "Offline"
-  },
-  "historyTitle": {
-    "message": "Change history"
-  },
-  "historyExpand": {
-    "message": "Expand history panel"
-  },
-  "historyCollapse": {
-    "message": "Collapse history panel"
-  },
-  "historyLoading": {
-    "message": "Loading…"
-  },
-  "historyEmpty": {
-    "message": "No history entries"
-  },
-  "historyEnd": {
-    "message": "End of list"
   },
   "serverLabel": {
     "message": "SERVER"
@@ -109,5 +82,29 @@
   },
   "pullNoProject": {
     "message": "Select a project for the current host first"
+  },
+  "save": {
+    "message": "Save"
+  },
+  "cancel": {
+    "message": "Cancel"
+  },
+  "addProjectTitle": {
+    "message": "Add project mapping"
+  },
+  "editProjectTitle": {
+    "message": "Edit project mapping"
+  },
+  "confirmDelete": {
+    "message": "Delete this project mapping?"
+  },
+  "hostRequired": {
+    "message": "Host is required"
+  },
+  "nameRequired": {
+    "message": "Project name is required"
+  },
+  "pathRequired": {
+    "message": "Path is required"
   }
 }

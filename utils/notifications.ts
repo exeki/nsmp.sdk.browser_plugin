@@ -12,15 +12,15 @@ async function show(title: string, message: string): Promise<void> {
 }
 
 class NotificationService {
-    info(title: string, message: string) {
+    info(title: string, message: string): void {
         void show(title, message);
     }
 
-    error(title: string, message: string) {
+    error(title: string, message: string): void {
         void show(title, message);
     }
 }
 
-const notifications = new NotificationService()
+const notifications = new NotificationService();
 
-export {notifications, show};
+export {notifications};

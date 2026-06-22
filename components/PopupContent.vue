@@ -7,17 +7,10 @@ import {getProjects, pull, type Project} from '@/utils/localServiceConnector';
 import {notifications} from '@/utils/notifications';
 import {isRuntimeMessage} from '@/utils/messages';
 import {settings, type ProjectMapping} from '@/utils/settings';
-
-import {
-  checkServerStatus,
-  manualCheck,
-  serverStatus,
-  startAutoCheck,
-  stopAutoCheck,
-} from '@/utils/serverStatus';
+import {disposeServerStatus, initServerStatus, manualCheck, serverStatus} from '@/utils/serverStatus';
 
 const NONE = () => t('none');
-const optionsUrl = browser.runtime.getURL('options.html');
+const optionsUrl = browser.runtime.getURL('/options.html');
 
 const port = ref(0);
 const currentHost = ref<string | null>(null);
@@ -183,12 +176,30 @@ function onRuntimeMessage(msg: unknown): void {
   applyTabUrl(msg.url);
 }
 
+function onStorageChanged(
+    changes: Record<string, { newValue?: unknown; oldValue?: unknown }>,
+    area: string,
+): void {
+  if (area !== 'local') return;
+
+  if (changes.port) {
+    port.value = (changes.port.newValue as number | undefined) ?? 0;
+    if (currentHost.value) {
+      void loadProjects(currentHost.value);
+    }
+  }
+
+  if (changes.projectMappings && currentHost.value) {
+    void syncProjectSelection(currentHost.value);
+  }
+}
+
 onMounted(async () => {
   port.value = await settings.getPort();
-  checkServerStatus();
-  startAutoCheck();
+  await initServerStatus();
 
   browser.runtime.onMessage.addListener(onRuntimeMessage);
+  browser.storage.onChanged.addListener(onStorageChanged);
 
   const [tab] = await browser.tabs.query({active: true, currentWindow: true});
   applyTabUrl(tab?.url);
@@ -196,7 +207,8 @@ onMounted(async () => {
 
 onUnmounted(() => {
   browser.runtime.onMessage.removeListener(onRuntimeMessage);
-  stopAutoCheck();
+  browser.storage.onChanged.removeListener(onStorageChanged);
+  disposeServerStatus();
 });
 </script>
 

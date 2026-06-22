@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import PopupContent from '@/components/PopupContent.vue';
-import {darkTheme, NConfigProvider, NNotificationProvider} from 'naive-ui';
+import {darkTheme, NConfigProvider} from 'naive-ui';
 import {computed, onMounted, onUnmounted, ref} from 'vue';
 
 const darkMql = window.matchMedia('(prefers-color-scheme: dark)');
@@ -23,9 +23,7 @@ onUnmounted(() => {
 
 <template>
   <NConfigProvider :theme="theme" class="popup-root">
-    <NNotificationProvider :max="3" placement="bottom-right">
-      <PopupContent/>
-    </NNotificationProvider>
+    <PopupContent/>
   </NConfigProvider>
 </template>
 

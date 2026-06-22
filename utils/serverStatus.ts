@@ -1,39 +1,49 @@
 import {ref} from 'vue';
-import {checkHealth} from '@/utils/localServiceConnector';
-import {settings} from '@/utils/settings';
+import {Messages, isRuntimeMessage, type ServerStatus, type ServerStatusResponse} from '@/utils/messages';
 
-const serverStatus = ref<'online' | 'offline' | 'unknown'>('unknown');
+const serverStatus = ref<ServerStatus | 'unknown'>('unknown');
 const isChecking = ref(false);
 
-const checkServerStatus = async (): Promise<'online' | 'offline'> => {
-    const port = await settings.getPort();
-    const online = await checkHealth(port);
-    serverStatus.value = online ? 'online' : 'offline';
-    console.log(`Server is ${serverStatus.value}`);
-    return serverStatus.value;
+let listenerAttached = false;
+
+const applyStatus = (status: ServerStatus): void => {
+    serverStatus.value = status;
 };
 
-const manualCheck = async () => {
-    if (isChecking.value) return;
-    isChecking.value = true;
-    await checkServerStatus();
-    isChecking.value = false;
+const onRuntimeMessage = (msg: unknown): void => {
+    if (!isRuntimeMessage(msg) || msg.type !== 'SERVER_STATUS_UPDATE') return;
+    applyStatus(msg.status);
 };
 
-let intervalId: number | null = null;
+const initServerStatus = async (): Promise<void> => {
+    if (!listenerAttached) {
+        browser.runtime.onMessage.addListener(onRuntimeMessage);
+        listenerAttached = true;
+    }
 
-const startAutoCheck = () => {
-    if (intervalId) return;
-    intervalId = window.setInterval(() => {
-        void checkServerStatus();
-    }, 10000);
-};
-
-const stopAutoCheck = () => {
-    if (intervalId) {
-        clearInterval(intervalId);
-        intervalId = null;
+    try {
+        const response = await browser.runtime.sendMessage(Messages.getServerStatus()) as ServerStatusResponse | undefined;
+        if (response?.status) applyStatus(response.status);
+    } catch {
+        // background may be unavailable during extension reload
     }
 };
 
-export {serverStatus, checkServerStatus, manualCheck, startAutoCheck, stopAutoCheck};
+const disposeServerStatus = (): void => {
+    if (!listenerAttached) return;
+    browser.runtime.onMessage.removeListener(onRuntimeMessage);
+    listenerAttached = false;
+};
+
+const manualCheck = async (): Promise<void> => {
+    if (isChecking.value) return;
+    isChecking.value = true;
+    try {
+        const response = await browser.runtime.sendMessage(Messages.checkServer()) as ServerStatusResponse | undefined;
+        if (response?.status) applyStatus(response.status);
+    } finally {
+        isChecking.value = false;
+    }
+};
+
+export {serverStatus, initServerStatus, disposeServerStatus, manualCheck};
