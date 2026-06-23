@@ -1,5 +1,4 @@
 import {defineConfig} from 'wxt';
-import { resolve } from 'node:path';
 
 export default defineConfig({
     modules: ['@wxt-dev/module-vue'],
@@ -9,10 +8,6 @@ export default defineConfig({
         options_page: 'options.html',
         default_locale: 'en',
         permissions: ['alarms', 'notifications', 'storage', 'tabs'],
-        host_permissions: ['http://127.0.0.1/*', '*://*/sd/admin/*'],
-        runner : {
-            chromiumProfile: resolve('.wxt/chrome-data'),
-            keepProfileChanges: true,
-        }
+        host_permissions: ['http://127.0.0.1/*', '*://*/sd/admin/*']
     },
 });
