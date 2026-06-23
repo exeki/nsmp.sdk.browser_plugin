@@ -180,13 +180,13 @@ function onStorageChanged(
 }
 
 onMounted(async () => {
-  port.value = await settings.getPort();
+  port.value = await settings.getPort()
   await initServerStatus();
 
   browser.runtime.onMessage.addListener(onRuntimeMessage);
   browser.storage.onChanged.addListener(onStorageChanged);
 
-  const [tab] = await browser.tabs.query({active: true, currentWindow: true});
+  const [tab] = await browser.tabs.query({active: true, currentWindow: true})
   applyTabUrl(tab?.url);
 });
 
@@ -220,14 +220,14 @@ onUnmounted(() => {
         <div class="field__label">{{ t('project') }}</div>
         <div class="field__value">
           <NSelect :value="selectedProjectPath"
-              :options="projectOptions"
-              :loading="projectsLoading"
-              :disabled="!currentHost"
-              :placeholder="t('selectProject')"
-              filterable
-              clearable
-              size="small"
-              @update:value="onProjectSelect"/>
+                   :options="projectOptions"
+                   :loading="projectsLoading"
+                   :disabled="!currentHost"
+                   :placeholder="t('selectProject')"
+                   filterable
+                   clearable
+                   size="small"
+                   @update:value="onProjectSelect"/>
           <p v-if="projectsError" class="field__error">{{ projectsError }}</p>
         </div>
       </section>

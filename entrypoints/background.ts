@@ -14,10 +14,12 @@ const ICON_OFFLINE = 'icon-gray/128.png';
 
 let serverStatus: ServerStatus | 'unknown' = 'unknown';
 
+const actionApi = browser.action ?? browser.browserAction;
+
 const updateIcon = (): void => {
     const iconPath = serverStatus === 'online' ? ICON_ONLINE : ICON_OFFLINE;
 
-    browser.action.setIcon({
+    actionApi.setIcon({
         path: {
             '16': iconPath.replace('128', '16'),
             '32': iconPath.replace('128', '32'),
