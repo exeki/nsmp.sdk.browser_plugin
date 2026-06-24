@@ -16,8 +16,9 @@
 
 ## Требования
 
-- **Chrome** 120+, **Firefox** 115+ или **Safari** 17+ (macOS)
-- [Плагин NSMP SDK для IDE](https://github.com/exeki/nsmp.sdk.intellij_plugin)
+1. **Chrome** 120+, **Firefox** 115+ или **Safari** 17+ (macOS)
+2. [Плагин NSMP SDK для IDE](https://github.com/exeki/nsmp.sdk.intellij_plugin)
+3. Инсталляция NSMP (тестировалось только на Naumen Service Desk 4.20+)
 
 ## Установка из релиза
 
