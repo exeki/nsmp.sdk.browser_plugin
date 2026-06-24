@@ -5,11 +5,13 @@
 
 # Сборка и тестирование
 - Минимум: Chrome 120+, Firefox 115+, Safari 17+ (macOS).
-- Сборки: `wxt build -b chrome | firefox | safari --mv3`
+- Сборки: `wxt build -b chrome | firefox | safari --mv3` (Firefox: `manifestVersion: 3` в `wxt.config.ts`).
+- Dev: `npm run dev` (Chrome, порт 3000), `npm run dev:firefox` (порт 3001), `npm run dev:safari` (порт 3002).
 - Safari (MVP): только ручная установка через Xcode / safari-web-extension-converter, без App Store.
 - API: только `browser.*` (кроссплатформенно), без chrome-only.
 - `host_permissions`: `http://127.0.0.1/*` и `*://*/sd/admin/*`.
-- `permissions`: `alarms`, `notifications`, `storage`, `tabs`.
+- `permissions`: `notifications`, `storage`, `tabs`.
+- Firefox: `browser_specific_settings.gecko.data_collection_permissions.required: ['websiteActivity']` — расширение читает URL активной вкладки для определения NSD-хоста и исходника.
 
 # Совместимость
 Chrome, Safari, Firefox. Только MV3.
@@ -29,13 +31,13 @@ Chrome, Safari, Firefox. Только MV3.
 # Архитектура
 
 ## Background (`entrypoints/background.ts`)
-- Периодическая проверка локального сервера через `browser.alarms` (интервал ~10 сек, `GET http://127.0.0.1:{port}/`).
+- Периодическая проверка локального сервера через `setInterval` (интервал ~10 сек, `GET http://127.0.0.1:{port}/`).
 - Ручная проверка по сообщению `CHECK_SERVER`.
 - Рассылка `SERVER_STATUS_UPDATE` при смене статуса.
 - Ответ на `GET_SERVER_STATUS` — текущий статус.
 - Отслеживание активной вкладки: `URL_UPDATED` при смене/загрузке вкладки.
 - Реакция на смену порта в storage — немедленная перепроверка.
-- Иконка расширения: цветная (`public/icon/`) при online, серая (`public/icon-gray/`) при offline.
+- Иконка расширения: `browser.action ?? browser.browserAction`, цветная (`public/icon/`) при online, серая (`public/icon-gray/`) при offline.
 
 ## Локальный сервис (`utils/localServiceConnector.ts`)
 Все HTTP-запросы к локальному серверу:
@@ -44,6 +46,10 @@ Chrome, Safari, Firefox. Только MV3.
 - `POST /pull` — запуск pull
 
 Порт `0` отключает обращения к серверу.
+
+## Маппинг проектов (`utils/projectMapping.ts`)
+- `loadProjectsForHost(port, host)` — загрузка и фильтрация проектов с локального сервера.
+- `applyProjectMapping`, `buildProjectSelectOptions`, `filterProjectsByHost`.
 
 ## Сообщения (`utils/messages.ts`)
 Типизированный протокол между контекстами:
@@ -81,6 +87,11 @@ Popup подписан на `URL_UPDATED` и `SERVER_STATUS_UPDATE`. Стату�
 1. Порт локального сервера (0–65535, дефолт 8123). Порт 0 отключает локальный сервер.
 2. Переключатель оповещений (вкл/выкл `browser.notifications`).
 3. Таблица маппингов host → project → path с кнопками добавить, редактировать, удалить.
+
+# Dev-окружение (`wxt.config.ts`)
+- `manifestVersion: 3`
+- `webExt.keepProfileChanges: true` — сохранение профиля браузера между запусками dev.
+- `webExt.chromiumProfile: .wxt/chrome-data`
 
 # Иконка
 Исходники: `icons/nsmp_logo_colored.svg`, `icons/nsmp_logo_gray.svg`.

@@ -14,11 +14,11 @@ import {
   NModal,
   NSelect,
 } from 'naive-ui';
-import {getProjects, type Project} from '@/utils/localServiceConnector';
+import {type Project} from '@/utils/localServiceConnector';
 import {
   applyProjectMapping,
   buildProjectSelectOptions,
-  filterProjectsByHost,
+  loadProjectsForHost,
 } from '@/utils/projectMapping';
 import {settings, type HostMapping, type ProjectMapping} from '@/utils/settings';
 
@@ -49,29 +49,18 @@ async function reloadMappings(): Promise<void> {
 }
 
 async function loadModalProjects(host: string): Promise<void> {
-  const trimmedHost = host.trim();
-  if (!trimmedHost) {
-    projects.value = [];
-    projectsError.value = null;
-    return;
-  }
-
   projectsLoading.value = true;
   projectsError.value = null;
 
   try {
     const currentPort = port.value || await settings.getPort();
-    if (currentPort === 0) {
-      projects.value = [];
+    const result = await loadProjectsForHost(currentPort, host);
+    projects.value = result.projects;
+    if (result.error === 'port_disabled') {
       projectsError.value = t('serverPortDisabled');
-      return;
+    } else if (result.error === 'load_failed') {
+      projectsError.value = t('projectsLoadFailed');
     }
-
-    const data = await getProjects(currentPort);
-    projects.value = filterProjectsByHost(data, trimmedHost);
-  } catch {
-    projects.value = [];
-    projectsError.value = t('projectsLoadFailed');
   } finally {
     projectsLoading.value = false;
   }

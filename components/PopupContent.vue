@@ -3,11 +3,11 @@ import {computed, onMounted, onUnmounted, ref} from 'vue';
 import {NButton, NSelect} from 'naive-ui';
 import {t} from '@/utils/i18n';
 import {extractNsdHost, parseSrcPage, type SrcPageContext} from '@/utils/nsdUrl';
-import {getProjects, pull, type Project} from '@/utils/localServiceConnector';
+import {pull, type Project} from '@/utils/localServiceConnector';
 import {
   applyProjectMapping,
   buildProjectSelectOptions,
-  filterProjectsByHost,
+  loadProjectsForHost,
 } from '@/utils/projectMapping';
 import {notifications} from '@/utils/notifications';
 import {isRuntimeMessage} from '@/utils/messages';
@@ -95,17 +95,13 @@ async function loadProjects(host: string): Promise<void> {
   projectsError.value = null;
 
   try {
-    if (port.value === 0) {
-      projects.value = [];
+    const result = await loadProjectsForHost(port.value, host);
+    projects.value = result.projects;
+    if (result.error === 'port_disabled') {
       projectsError.value = t('serverPortDisabled');
-      return;
+    } else if (result.error === 'load_failed') {
+      projectsError.value = t('projectsLoadFailed');
     }
-
-    const data = await getProjects(port.value);
-    projects.value = filterProjectsByHost(data, host);
-  } catch {
-    projects.value = [];
-    projectsError.value = t('projectsLoadFailed');
   } finally {
     projectsLoading.value = false;
   }

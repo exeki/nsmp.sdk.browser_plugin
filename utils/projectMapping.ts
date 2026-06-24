@@ -1,5 +1,12 @@
-import type {Project} from '@/utils/localServiceConnector';
+import {getProjects, type Project} from '@/utils/localServiceConnector';
 import {settings, type ProjectMapping} from '@/utils/settings';
+
+export type LoadProjectsError = 'port_disabled' | 'load_failed';
+
+export interface LoadProjectsResult {
+    projects: Project[];
+    error: LoadProjectsError | null;
+}
 
 export function normalizeHost(host: string): string {
     return host.trim().toLowerCase();
@@ -28,6 +35,23 @@ export function buildProjectSelectOptions(
     }
 
     return opts;
+}
+
+export async function loadProjectsForHost(port: number, host: string): Promise<LoadProjectsResult> {
+    if (!host.trim()) {
+        return {projects: [], error: null};
+    }
+
+    if (port === 0) {
+        return {projects: [], error: 'port_disabled'};
+    }
+
+    try {
+        const data = await getProjects(port);
+        return {projects: filterProjectsByHost(data, host), error: null};
+    } catch {
+        return {projects: [], error: 'load_failed'};
+    }
 }
 
 export async function applyProjectMapping(
