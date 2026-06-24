@@ -1,48 +1,72 @@
 # NSMP SDK Browser Plugin
 
-Browser extension for working with NSMP SDK and a local development server.
+Браузерное расширение для работы с плагином для JetBrains Platform NSMP SDK плагином.
+Позволяет загружать исходники из GUI инсталляции NSMP в JetBrains Platform IDE с NSMP SDK плагином.
 
-## Requirements
+Поддерживаются **Chrome**, **Firefox** и **Safari** (Manifest V3).
 
-- Node.js
-- Chrome 120+, Firefox 115+, or Safari 17+ (macOS)
+## Функционал
 
-## Setup
+- Проверка доступности локального сервера, поднимаемого плагином для IDE (иконка расширения: цветная — online, серая — offline)
+- Определение хоста и исходника по URL активной вкладки
+- Выбор проекта для хоста и сохранение маппинга `host → project_path`
+- Pull исходника на локальный сервер (`POST /pull`)
+- Настройки порта, оповещений и маппингов в options
+- Локализация: русский и английский (по языку браузера)
 
-```bash
-npm install
-npm run icons:generate
-```
+## Требования
 
-## Development
+- **Chrome** 120+, **Firefox** 115+ или **Safari** 17+ (macOS)
+- [Плагин NSMP SDK для IDE](https://github.com/exeki/nsmp.sdk.intellij_plugin)
 
-```bash
-npm run dev              # Chrome
-npm run dev:firefox
-npm run dev:safari
-```
+## Установка из релиза
 
-## Build
+Готовые сборки публикуются в [GitHub Releases](https://github.com/exeki/nsmp.sdk.browser_plugin/releases):
 
-```bash
-npm run build            # Chrome
-npm run build:firefox
-npm run build:safari
-npm run compile
-```
+| Файл | Браузер |
+|------|---------|
+| `*-chrome.zip` | Chrome, Edge и другие Chromium-браузеры |
+| `*-firefox.zip` | Firefox |
+| `*-safari.zip` | Safari (требуется конвертация через Xcode, см. ниже) |
 
-## Package
+### Chrome / Edge
 
-```bash
-npm run zip
-npm run zip:firefox
-npm run zip:safari
-```
+1. Распакуйте `*-chrome.zip`
+2. Откройте `chrome://extensions`
+3. Включите «Режим разработчика»
+4. «Загрузить распакованное расширение» → выберите распакованную папку
 
-## Configuration
+### Firefox
 
-Open extension options and set the local server port (default `8123`, `0` disables the server).
+1. Распакуйте `*-firefox.zip`
+2. Откройте `about:debugging` → «This Firefox»
+3. «Load Temporary Add-on» → выберите `manifest.json` из распакованной папки
 
-Project mappings can be configured in options or from the extension popup on NSD pages.
+Для постоянной установки используйте [Firefox Add-ons](https://addons.mozilla.org/) (после публикации) или signed XPI.
 
-See `specification.md` for full behavior details.
+### Safari
+
+1. Распакуйте `*-safari.zip`
+2. Конвертируйте через [safari-web-extension-converter](https://developer.apple.com/documentation/safariservices/safari_web_extensions/converting_a_web_extension_for_safari)
+3. Соберите и установите через Xcode
+
+## Настройка расширения
+
+Откройте **Settings** в popup или страницу options расширения.
+
+| Параметр | Описание                                                                                           |
+|----------|----------------------------------------------------------------------------------------------------|
+| **Порт сервера** | Порт локального NSMP SDK сервера (по умолчанию `8123`). Значение `0` отключает обращения к серверу |
+| **Оповещения** | Системные уведомления при pull и ошибках                                                           |
+| **Маппинги проектов** | Таблица соответствий `хост → путь к проекту`                                                       |
+
+Маппинг можно также задать прямо в popup, находясь на странице NSD (`*/sd/admin/*`).
+
+## Использование popup
+
+1. Откройте страницу NSD с исходником (hash вида `#scriptModule:…`, `#script:…`, `#advImportConfig:…`)
+2. Убедитесь, что индикатор сервера **online** (зелёная точка; клик — ручная проверка)
+3. Выберите **Project** для текущего хоста
+4. Нажмите **Pull** для загрузки текущего исходника
+
+Кнопка Pull недоступна, если: нет исходника в URL ИЛИ не выбран проект ИЛИ сервер offline ИЛИ порт `0`.
